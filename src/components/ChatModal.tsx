@@ -3,24 +3,15 @@ import {
   Modal,
   Box,
   Typography,
-  Grid,
   TextField,
   IconButton,
   useMediaQuery,
 } from "@mui/material";
 import { Close, Minimize, Send } from "@mui/icons-material";
 import { useTheme } from "@mui/material/styles";
-
-export interface Message {
-  content: string;
-  sender: "user" | "other";
-}
-
-interface ChatModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  onMinimize: () => void;
-}
+import { useScrollToBottom } from "../hooks/useScrollToBottom";
+import { Message } from "../types/Message";
+import { ChatModalProps } from "../types/ChatModalProps";
 
 export const ChatModal: React.FC<ChatModalProps> = ({
   isOpen,
@@ -33,6 +24,7 @@ export const ChatModal: React.FC<ChatModalProps> = ({
   ]);
 
   const theme = useTheme();
+  const messagesEndRef = useScrollToBottom([chatHistory]);
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
   const handleSendMessage = () => {
@@ -56,19 +48,14 @@ export const ChatModal: React.FC<ChatModalProps> = ({
           position: "fixed",
           bottom: isMobile ? 0 : 16,
           right: isMobile ? 0 : 16,
-          width: isMobile ? "100%" : 400,
-          height: isMobile ? "100%" : "auto",
+          width: isMobile ? "100vw" : 400,
+          height: isMobile ? "100vh" : "auto",
           bgcolor: "background.paper",
           boxShadow: 24,
           p: isMobile ? 0 : 4,
           borderRadius: isMobile ? "12px 12px 0 0" : "8px",
-          "@media (max-width: 600px)": {
-            width: "100%",
-            bottom: 0,
-            right: 0,
-            borderRadius: 0,
-            maxWidth: "100%",
-          },
+          display: "flex",
+          flexDirection: "column",
         }}
       >
         {/* Header with Minimize and Close buttons */}
@@ -94,7 +81,7 @@ export const ChatModal: React.FC<ChatModalProps> = ({
           sx={{
             height: isMobile ? "80%" : 200,
             overflowY: "auto",
-            border: "1px solid #ccc",
+            border: "1px solid #CCC",
             p: 2,
             mb: 2,
             mt: 2,
@@ -110,6 +97,7 @@ export const ChatModal: React.FC<ChatModalProps> = ({
                   justifyContent:
                     msg.sender === "user" ? "flex-end" : "flex-start", // Align based on sender
                 }}
+                ref={messagesEndRef}
               >
                 <Typography
                   variant="body2"
@@ -117,7 +105,7 @@ export const ChatModal: React.FC<ChatModalProps> = ({
                     mb: 1,
                     p: 1,
                     maxWidth: "70%",
-                    bgcolor: msg.sender === "user" ? "#53A318" : "#f0f0f0", // Color based on sender
+                    bgcolor: msg.sender === "user" ? "#53A318" : "#F0F0F0", // Color based on sender
                     color: msg.sender === "user" ? "white" : "black",
                     borderRadius: "8px",
                   }}
@@ -139,9 +127,8 @@ export const ChatModal: React.FC<ChatModalProps> = ({
             placeholder="Type a message..."
             style={{
               width: "calc(100% - 48px)",
-              padding: "8px",
               borderRadius: "8px",
-              border: "1px solid #ccc",
+              border: "1px solid #CCC",
             }}
             value={message}
             onChange={(e) => setMessage(e.target.value)}
@@ -159,7 +146,7 @@ export const ChatModal: React.FC<ChatModalProps> = ({
               marginLeft: "8px",
               backgroundColor: "#53A318",
               color: "white",
-              "&:hover": { backgroundColor: "#3e7a13" },
+              "&:hover": { backgroundColor: "#3E7A13" },
             }}
           >
             <Send />
