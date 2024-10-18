@@ -12,6 +12,7 @@ import { useTheme } from "@mui/material/styles";
 import { useScrollToBottom } from "../hooks/useScrollToBottom";
 import { Message } from "../types/Message";
 import { ChatModalProps } from "../types/ChatModalProps";
+import { sendMessageToChatGPT } from "../utils/api";
 
 export const ChatModal: React.FC<ChatModalProps> = ({
   isOpen,
@@ -19,19 +20,30 @@ export const ChatModal: React.FC<ChatModalProps> = ({
   onMinimize,
 }) => {
   const [message, setMessage] = useState<string>("");
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [chatHistory, setChatHistory] = useState<Message[]>([
-    { content: "he", sender: "other" },
+    { content: "Hello! How can I help you?", sender: "other" },
   ]);
 
   const theme = useTheme();
   const messagesEndRef = useScrollToBottom([chatHistory]);
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
-  const handleSendMessage = () => {
+  const handleSendMessage = async () => {
     if (message.trim() !== "") {
       const newMessage: Message = { content: message, sender: "user" };
       setChatHistory([...chatHistory, newMessage]);
       setMessage("");
+
+      setIsLoading(true);
+      const chatGPTResponse = await sendMessageToChatGPT(message);
+      setIsLoading(false);
+
+      const responseMessage: Message = {
+        content: chatGPTResponse,
+        sender: "other",
+      };
+      setChatHistory((prevHistory) => [...prevHistory, responseMessage]);
     }
   };
 
@@ -116,6 +128,11 @@ export const ChatModal: React.FC<ChatModalProps> = ({
             ))
           ) : (
             <Typography variant="body2">No messages yet.</Typography>
+          )}
+          {isLoading && (
+            <Typography variant="body2" sx={{ color: "gray" }}>
+              ChatGPT is typing...
+            </Typography>
           )}
         </Box>
 

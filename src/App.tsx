@@ -2,7 +2,6 @@ import { ThemeProvider } from "@mui/material/styles";
 import { grouponTheme } from "./style/theme";
 import { Typography } from "@mui/material";
 import { Chatbox } from "./components/ChatBox";
-
 /**
 Use MUI because it is easy to customize ==> theme wise
 Also using components that are already made to save time.
